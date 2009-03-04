@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Le Petite URL
+Plugin Name: le petite url
 Plugin URI: http://philnelson.name/projects/le-petite-url
 Description: A personal URL shortener.
 Version: 1.0
@@ -23,57 +23,126 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
-
-add_option("ef_la_petite_url_version", "1.0");
-
 global $wpdb;
+global $petite_table;
 
-$url_table = $wpdb->prefix . "le_petitte_urls";
+$petite_table = "le_petite_urls";
 
-register_activation_hook(__FILE__, "test_function");
-//add_action ( 'init', 'check_for_petite_url', [priority], [accepted_args] );
 
-if(!function_exists('check_for_petite_url'))
+add_option("le_petite_url_version", "1.0");
+add_option("le_petite_use_mobile_style", "yes");
+
+function check_for_petite_url($the_petite)
 {
-	function check_for_petite_url()
+	global $wpdb;
+	global $petite_table;
+
+	//echo $the_petite;
+	$post_query = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."$petite_table WHERE petite_url = '".$the_petite."'");
+	//echo "SELECT * FROM ".$wpdb->prefix."$petite_table WHERE petite_url = '".$the_petite."'";
+	if(count($post_query) > 0)
 	{
-	
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 }
 
-if(!function_exists('petite_url'))
+function generate_petite_string()
 {
-	function petite_url($post)
-	{
+	for ($s = '', $i = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $i != 5; $x = rand(0,$z), $s .= $a{$x}, $i++);
+	return $s;
+}
+
+function make_petite_url($post)
+{
+	//print($post);
+	global $wpdb;
+	global $petite_table;
 	
+	try {
+	$post_parent = $wpdb->get_var("SELECT post_parent FROM ".$wpdb->posts." WHERE ID = ".$post."");
+	} catch (Exception $e) {
+		echo 'Caught exception: ',  $e->getMessage(), "\n";
+	}
+	
+	$post_query = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."$petite_table WHERE post_id = ".$post."");
+	
+	if(count($post_query) == 0)
+	{
+		$good_url = "no";
+		while($good_url == "no")
+		{
+			$string = generate_petite_string();
+			$post_query = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."$petite_table WHERE petite_url = ".$string."");
+			if(count($post_query) == 0)
+			{
+				$good_url = "yes";
+				try {
+					$wpdb->query("INSERT INTO ".$wpdb->prefix. $petite_table ." VALUES($post_parent,'".mysql_real_escape_string($string)."')");
+				}
+				catch(Exception $e)
+				{
+					echo 'Caught exception: ',  $e->getMessage(), "\n";
+				}
+				//print("INSERT INTO ".$wpdb->prefix. $petite_table ." VALUES($post,'".mysql_real_escape_string($string)."')");
+			}
+		}
+	}
+}
+
+function do_petite_redirect()
+{
+	global $wpdb;
+	global $petite_table;
+	
+	$request = $_SERVER['REQUEST_URI'];
+	$the_petite = trim($request);
+	$the_petite = trim($the_petite,"/");
+	
+	if(check_for_petite_url($the_petite))
+	{
+		$post_id = $wpdb->get_var("SELECT post_id FROM $wpdb->prefix".$petite_table." WHERE petite_url = '".$the_petite."'");
+		header("HTTP/1.1 302 Found");
+		$expires = date('D, d M Y G:i:s T',strtotime("+1 week"));
+		//echo $expires;
+		header("Expires: ".$expires);
+		header('Location: '.get_permalink($post_id));
+	}
+	else
+	{
+		// do stuff like normal
 	}
 }
 
 function test_function()
 {
-	print("hello");
+	echo "this is a thing";
 }
 
-if(!function_exists('le_petite_install'))
+function le_petite_install()
 {
-	function le_petite_install()
+	global $wpdb;
+	global $petite_table;
+	$url_table = $wpdb->prefix . $petite_table;
+	if($wpdb->get_var("SHOW TABLES LIKE '$url_table'") != $url_table) 
 	{
-		global $wpdb;
-		if($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) 
-		{
-			$sql = "CREATE TABLE  `" . $table_name . "` (
-					`post_id` INT NOT NULL ,
-					`petite_url` VARCHAR( 255 ) NOT NULL ,
-					PRIMARY KEY (  `post_id` )
-					) ENGINE = MYISAM";
-			require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
-			dbDelta($sql);
-		}
-		else
-		{
-			echo "yes";
-		}
+		$sql = "CREATE TABLE  `" . $url_table . "` (
+				`post_id` INT NOT NULL ,
+				`petite_url` VARCHAR( 255 ) NOT NULL ,
+				PRIMARY KEY (  `post_id` )
+				);";
+		require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+		dbDelta($sql);
 	}
+
 }
+
+register_activation_hook(__FILE__, "le_petite_install");
+
+add_action('template_redirect','do_petite_redirect');
+add_action('save_post','make_petite_url');
 
 ?>
