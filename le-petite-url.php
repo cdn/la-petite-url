@@ -30,7 +30,7 @@ global $wpdb;
 
 $url_table = $wpdb->prefix . "le_petitte_urls";
 
-register_activation_hook(__FILE__, "le_petite_install");
+register_activation_hook(__FILE__, "test_function");
 //add_action ( 'init', 'check_for_petite_url', [priority], [accepted_args] );
 
 if(!function_exists('check_for_petite_url'))
@@ -47,6 +47,11 @@ if(!function_exists('petite_url'))
 	{
 	
 	}
+}
+
+function test_function()
+{
+	print("hello");
 }
 
 if(!function_exists('le_petite_install'))
