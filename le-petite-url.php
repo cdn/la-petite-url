@@ -108,11 +108,10 @@ function do_petite_redirect()
 	{
 		$post_id = $wpdb->get_var("SELECT post_id FROM $wpdb->prefix".$petite_table." WHERE petite_url = '".$the_petite."'");
 		
-		header("HTTP/1.1 302 Found");
 		$expires = date('D, d M Y G:i:s T',strtotime("+1 week"));
 
 		header("Expires: ".$expires);
-		header('Location: '.get_permalink($post_id));
+		header('Location: '.get_permalink($post_id), true, 302);
 	}
 	else
 	{
