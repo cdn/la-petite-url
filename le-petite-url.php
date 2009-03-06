@@ -30,7 +30,9 @@ $petite_table = "le_petite_urls";
 
 
 add_option("le_petite_url_version", "1.0");
-add_option("le_petite_use_mobile_style", "yes");
+add_option("le_petite_url_use_mobile_style", "yes");
+add_option("le_petite_url_link_text", "petite url");
+add_option("le_petite_url_permalink_structure", "%%petite%%");
 
 function check_for_petite_url($the_petite)
 {
@@ -105,9 +107,10 @@ function do_petite_redirect()
 	if(check_for_petite_url($the_petite))
 	{
 		$post_id = $wpdb->get_var("SELECT post_id FROM $wpdb->prefix".$petite_table." WHERE petite_url = '".$the_petite."'");
+		
 		header("HTTP/1.1 302 Found");
 		$expires = date('D, d M Y G:i:s T',strtotime("+1 week"));
-		//echo $expires;
+
 		header("Expires: ".$expires);
 		header('Location: '.get_permalink($post_id));
 	}
@@ -140,9 +143,52 @@ function le_petite_install()
 
 }
 
+function le_petite_url_sidebar() {
+
+    add_action('dbx_post_sidebar', 'generate_le_petite_url_sidebar' );
+    add_action('dbx_page_sidebar', 'generate_le_petite_url_sidebar' );
+  
+}
+
+function generate_le_petite_url_sidebar()
+{
+	echo "<h4>le petite url</h4>";
+}
+
+function the_petite_url()
+{
+	global $wp_query;
+	global $wpdb;
+	global $petite_table;
+	$url_table = $wpdb->prefix . $petite_table;
+	$post_id = $wp_query->post->ID;
+	$petite_url = $wpdb->get_var("SELECT petite_url FROM ".$url_table." WHERE post_id = ".$post_id."");
+	if($petite_url != "")
+	{
+		echo $petite_url;
+	}
+}
+
+function the_petite_url_link()
+{
+	global $wp_query;
+	global $wpdb;
+	global $petite_table;
+	$url_table = $wpdb->prefix . $petite_table;
+	$post_id = $wp_query->post->ID;
+	$petite_url = $wpdb->get_var("SELECT petite_url FROM ".$url_table." WHERE post_id = ".$post_id."");
+	if($petite_url != "")
+	{
+		$blogurl = get_bloginfo('siteurl');
+		echo '<a href="'.$blogurl.'/'.$petite_url.'" title="shortened permalink">petite url</a>';
+	}
+}
+
 register_activation_hook(__FILE__, "le_petite_install");
 
 add_action('template_redirect','do_petite_redirect');
 add_action('save_post','make_petite_url');
+
+add_action('admin_menu', 'le_petite_url_sidebar');
 
 ?>
