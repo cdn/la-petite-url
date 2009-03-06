@@ -168,7 +168,7 @@ function the_petite_url()
 	}
 }
 
-function the_petite_url_link()
+function the_petite_url_link($anchor_text = 'petite url')
 {
 	global $wp_query;
 	global $wpdb;
@@ -179,7 +179,7 @@ function the_petite_url_link()
 	if($petite_url != "")
 	{
 		$blogurl = get_bloginfo('siteurl');
-		echo '<a href="'.$blogurl.'/'.$petite_url.'" rel="nofollow" title="shortened permalink">petite url</a>';
+		echo '<a href="'.$blogurl.'/'.$petite_url.'" class="le_petite_url" rel="nofollow" title="shortened permalink">'.htmlspecialchars($anchor_text,ENT_QUOTES, 'UTF-8').'</a>';
 	}
 }
 
