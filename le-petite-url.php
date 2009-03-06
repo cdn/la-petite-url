@@ -34,7 +34,7 @@ add_option("le_petite_url_use_mobile_style", "yes");
 add_option("le_petite_url_link_text", "petite url");
 add_option("le_petite_url_permalink_structure", "%%petite%%");
 
-function check_for_petite_url($the_petite)
+function le_petite_url_check_url($the_petite)
 {
 	global $wpdb;
 	global $petite_table;
@@ -52,13 +52,13 @@ function check_for_petite_url($the_petite)
 	}
 }
 
-function generate_petite_string()
+function le_petite_url_generate_string()
 {
 	for ($s = '', $i = 0, $z = strlen($a = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789')-1; $i != 5; $x = rand(0,$z), $s .= $a{$x}, $i++);
 	return $s;
 }
 
-function make_petite_url($post)
+function le_petite_url_make_url($post)
 {
 	//print($post);
 	global $wpdb;
@@ -77,7 +77,7 @@ function make_petite_url($post)
 		$good_url = "no";
 		while($good_url == "no")
 		{
-			$string = generate_petite_string();
+			$string = le_petite_url_generate_string();
 			$post_query = $wpdb->get_row("SELECT * FROM ".$wpdb->prefix."$petite_table WHERE petite_url = ".$string."");
 			if(count($post_query) == 0)
 			{
@@ -95,7 +95,7 @@ function make_petite_url($post)
 	}
 }
 
-function do_petite_redirect()
+function le_petite_url_do_redirect()
 {
 	global $wpdb;
 	global $petite_table;
@@ -104,7 +104,7 @@ function do_petite_redirect()
 	$the_petite = trim($request);
 	$the_petite = trim($the_petite,"/");
 	
-	if(check_for_petite_url($the_petite))
+	if(le_petite_url_check_url($the_petite))
 	{
 		$post_id = $wpdb->get_var("SELECT post_id FROM $wpdb->prefix".$petite_table." WHERE petite_url = '".$the_petite."'");
 		
@@ -124,7 +124,7 @@ function test_function()
 	echo "this is a thing";
 }
 
-function le_petite_install()
+function le_petite_url_install()
 {
 	global $wpdb;
 	global $petite_table;
@@ -144,12 +144,12 @@ function le_petite_install()
 
 function le_petite_url_sidebar() {
 
-    add_action('dbx_post_sidebar', 'generate_le_petite_url_sidebar' );
-    add_action('dbx_page_sidebar', 'generate_le_petite_url_sidebar' );
+    add_action('dbx_post_sidebar', 'le_petite_url_generate_sidebar' );
+    add_action('dbx_page_sidebar', 'le_petite_url_generate_sidebar' );
   
 }
 
-function generate_le_petite_url_sidebar()
+function le_petite_url_generate_sidebar()
 {
 	echo "<h4>le petite url</h4>";
 }
@@ -179,14 +179,14 @@ function the_petite_url_link()
 	if($petite_url != "")
 	{
 		$blogurl = get_bloginfo('siteurl');
-		echo '<a href="'.$blogurl.'/'.$petite_url.'" title="shortened permalink">petite url</a>';
+		echo '<a href="'.$blogurl.'/'.$petite_url.'" rel="nofollow" title="shortened permalink">petite url</a>';
 	}
 }
 
-register_activation_hook(__FILE__, "le_petite_install");
+register_activation_hook(__FILE__, "le_petite_url_install");
 
-add_action('template_redirect','do_petite_redirect');
-add_action('save_post','make_petite_url');
+add_action('template_redirect','le_petite_url_do_redirect');
+add_action('save_post','le_petite_url_make_url');
 
 add_action('admin_menu', 'le_petite_url_sidebar');
 
