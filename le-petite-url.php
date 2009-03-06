@@ -144,14 +144,33 @@ function le_petite_url_install()
 
 function le_petite_url_sidebar() {
 
-    add_action('dbx_post_sidebar', 'le_petite_url_generate_sidebar' );
-    add_action('dbx_page_sidebar', 'le_petite_url_generate_sidebar' );
-  
+    if( function_exists( 'add_meta_box' )) {
+  		add_meta_box( 'le_petite_url_box', __( 'le petite url', 'le_petite_url_textdomain' ), 'le_petite_url_generate_sidebar', 'post', 'side' );
+	}
+	else
+	{
+		add_action('dbx_post_sidebar', 'le_petite_url_generate_sidebar' );
+    	add_action('dbx_page_sidebar', 'le_petite_url_generate_sidebar' );
+	}
 }
 
 function le_petite_url_generate_sidebar()
 {
-	echo "<h4>le petite url</h4>";
+	global $wp_query;
+	global $wpdb;
+	global $petite_table;
+	$url_table = $wpdb->prefix . $petite_table;
+	$post_id = $wpdb->escape($_GET['post']);
+	$petite_url = $wpdb->get_var("SELECT petite_url FROM ".$url_table." WHERE post_id = ".$post_id."");
+	if($petite_url != "")
+	{
+		echo "<p>This post's petite url is: <code>".$petite_url."</code>";
+		
+	}
+	else
+	{
+		echo "<p>This post doesn't seem to have a petite url. To generate one, save the post. The petite url will then appear right where this message is.</p>";
+	}
 }
 
 function the_petite_url()
@@ -183,11 +202,18 @@ function the_petite_url_link($anchor_text = 'petite url')
 	}
 }
 
+function le_petite_url_admin_panel()
+{
+	
+}
+
 register_activation_hook(__FILE__, "le_petite_url_install");
 
 add_action('template_redirect','le_petite_url_do_redirect');
 add_action('save_post','le_petite_url_make_url');
 
 add_action('admin_menu', 'le_petite_url_sidebar');
+
+add_action('admin_menu', 'le_petite_url_admin_panel');
 
 ?>
