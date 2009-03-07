@@ -122,9 +122,13 @@ function le_petite_url_do_redirect()
 	$the_petite = trim($request);
 	$the_petite = trim($the_petite,"/");
 	
-	if(le_petite_url_check_url($the_petite))
+	$le_petite_url_split = spliti('/',$the_petite);
+	
+	$le_petite_url_use = count($le_petite_url_split) - 1;
+	
+	if(le_petite_url_check_url($le_petite_url_split[$le_petite_url_use]))
 	{
-		$post_id = $wpdb->get_var("SELECT post_id FROM $wpdb->prefix".$petite_table." WHERE petite_url = '".$the_petite."'");
+		$post_id = $wpdb->get_var("SELECT post_id FROM $wpdb->prefix".$petite_table." WHERE petite_url = '".$le_petite_url_split[$le_petite_url_use]."'");
 		
 		$expires = date('D, d M Y G:i:s T',strtotime("+1 week"));
 
@@ -159,6 +163,7 @@ function le_petite_url_sidebar() {
 
     if( function_exists( 'add_meta_box' )) {
   		add_meta_box( 'le_petite_url_box', __( 'le petite url', 'le_petite_url_textdomain' ), 'le_petite_url_generate_sidebar', 'post', 'side' );
+  		add_meta_box( 'le_petite_url_box', __( 'le petite url', 'le_petite_url_textdomain' ), 'le_petite_url_generate_sidebar', 'page', 'side' );
 	}
 	else
 	{
@@ -180,8 +185,17 @@ function le_petite_url_generate_sidebar()
 	$petite_url = $wpdb->get_var("SELECT petite_url FROM ".$url_table." WHERE post_id = ".$post_id."");
 	if($petite_url != "")
 	{
-		
-		echo "<p>This post's petite url is: <code><a href='".$blogurl."/".$petite_url."'>".$petite_url."</a></code>";
+		$le_petite_url_permalink = $blogurl;
+		if(get_option('le_petite_url_permalink_prefix') != "")
+		{
+			$le_petite_url_permalink = $le_petite_url_permalink . get_option('le_petite_url_permalink_custom');
+		}
+		else
+		{
+			$le_petite_url_permalink = $le_petite_url_permalink . "/";
+		}
+		$le_petite_url_permalink = $le_petite_url_permalink . $petite_url;
+		echo "<p>This post's petite url is: <code><a href='".$le_petite_url_permalink."'>".$petite_url."</a></code>";
 		
 	}
 	else
@@ -206,7 +220,7 @@ function the_petite_url()
 	}
 }
 
-function the_petite_url_link($anchor_text = 'petite url')
+function the_petite_url_link()
 {
 	global $wp_query;
 	global $wpdb;
@@ -215,12 +229,21 @@ function the_petite_url_link($anchor_text = 'petite url')
 	$blogurl = get_bloginfo('siteurl');
 	$url_table = $wpdb->prefix . $petite_table;
 	$post_id = $wp_query->post->ID;
+	$anchor_text = get_option('le_petite_url_link_text');
 
 	$petite_url = $wpdb->get_var("SELECT petite_url FROM ".$url_table." WHERE post_id = ".$post_id."");
 	if($petite_url != "")
 	{
-		$le_petite_url_permalink_structure = get_option('le_petite_url_permalink_structure');
-		$le_petite_url_permalink = str_replace('%%petite%%',$petite_url,$le_petite_url_permalink_structure);
+		$le_petite_url_permalink = $blogurl;
+		if(get_option('le_petite_url_permalink_prefix') != "")
+		{
+			$le_petite_url_permalink = $le_petite_url_permalink . get_option('le_petite_url_permalink_custom');
+		}
+		else
+		{
+			$le_petite_url_permalink = $le_petite_url_permalink . "/";
+		}
+		$le_petite_url_permalink = $le_petite_url_permalink . $petite_url;
 		
 		echo '<a href="'.$le_petite_url_permalink.'" class="le_petite_url" rel="nofollow" title="shortened permalink">'.htmlspecialchars($anchor_text,ENT_QUOTES, 'UTF-8').'</a>';
 	}
@@ -240,9 +263,7 @@ register_activation_hook(__FILE__, "le_petite_url_install");
 
 add_action('template_redirect','le_petite_url_do_redirect');
 add_action('save_post','le_petite_url_make_url');
-
 add_action('admin_menu', 'le_petite_url_sidebar');
-
 add_action('admin_menu', 'le_petite_url_admin_panel');
 
 ?>
