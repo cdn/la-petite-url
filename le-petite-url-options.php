@@ -10,13 +10,13 @@ $le_petite_url_permalink_custom = get_option('le_petite_url_permalink_custom');
 <h3>General Settings</h3>
 <table class="form-table">
 	<tr valign="top">
-		<th><label><label>link text: </label></th>
+		<th><label>link text: </label></th>
 		<td>
 			<input name="le_petite_url_link_text" id="le_petite_url_link_text" type="text" value="<?php echo get_option('le_petite_url_link_text'); ?>" class="regular-text" />
 		</td>
 	</tr>
 	<tr valign="top">
-		<th><label><label>petite URL length: </label></th>
+		<th><label>petite URL length: </label></th>
 		<td>
 			<input name="le_petite_url_length" id="le_petite_url_length" type="text" value="<?php echo get_option('le_petite_url_length'); ?>" class="regular-text" />
 		</td>
