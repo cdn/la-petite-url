@@ -245,7 +245,7 @@ function the_petite_url_link()
 		}
 		$le_petite_url_permalink = $le_petite_url_permalink . $petite_url;
 		
-		echo '<a href="'.$le_petite_url_permalink.'" class="le_petite_url" rel="nofollow" title="shortened permalink">'.htmlspecialchars($anchor_text,ENT_QUOTES, 'UTF-8').'</a>';
+		echo '<a href="'.$le_petite_url_permalink.'" class="le_petite_url" rel="nofollow" title="shortened permalink">'.htmlspecialchars($anchor_text, ENT_QUOTES, 'UTF-8').'</a>';
 	}
 }
 
