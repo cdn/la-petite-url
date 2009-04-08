@@ -37,6 +37,14 @@ $le_petite_url_permalink_custom = get_option('le_petite_url_permalink_custom');
 		Use numbers (<code>0-9</code>)</label>
 		</fieldset></td>
 	</tr>
+	<tr valign="top">
+		<th scope="row">Short URL Auto-Detection Settings</th>
+		<td><fieldset><legend class="hidden">Short URL Auto-Detection Settings</legend>
+		<label for="le_petite_use_short_url">
+		<input name="le_petite_use_short_url" type="checkbox" id="le_petite_use_short_url" value="yes" <?php if(get_option('le_petite_use_short_url') == "yes") { echo 'checked="checked"'; } ?> />
+		Use <a href="http://sites.google.com/a/snaplog.com/wiki/short_url" title="Learn about short_url: the short_url wiki">short_url</a></label>
+		</fieldset></td>
+	</tr>
 </table>
 	<h3>Prefix settings</h3>
 <table class="form-table">

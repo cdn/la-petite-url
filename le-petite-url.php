@@ -3,7 +3,7 @@
 Plugin Name: le petite url
 Plugin URI: http://philnelson.name/projects/le-petite-url
 Description: A personal URL shortener.
-Version: 1.0
+Version: 1.01
 Author: Phil Nelson
 Author URI: http://philnelson.name
 
@@ -28,7 +28,7 @@ global $petite_table;
 
 $petite_table = "le_petite_urls";
 
-add_option("le_petite_url_version", "1.0");
+add_option("le_petite_url_version", "1.02");
 add_option("le_petite_url_use_mobile_style", "yes");
 add_option("le_petite_url_link_text", "petite url");
 add_option("le_petite_url_permalink_prefix", "");
@@ -37,6 +37,7 @@ add_option("le_petite_url_use_lowercase", "yes");
 add_option("le_petite_url_use_uppercase", "no");
 add_option("le_petite_url_use_numbers", "no");
 add_option("le_petite_url_length", "5");
+add_option("le_petite_use_short_url", "yes");
 
 function le_petite_url_check_url($the_petite)
 {
@@ -220,6 +221,21 @@ function the_petite_url()
 	}
 }
 
+function get_le_petite_url($post_id)
+{
+	global $wp_query;
+	global $wpdb;
+	global $petite_table;
+	
+	$url_table = $wpdb->prefix . $petite_table;
+
+	$petite_url = $wpdb->get_var("SELECT petite_url FROM ".$url_table." WHERE post_id = ".$post_id."");
+	if($petite_url != "")
+	{
+		return $petite_url;
+	}
+}
+
 function the_petite_url_link()
 {
 	global $wp_query;
@@ -259,11 +275,48 @@ function le_petite_url_settings()
 	require_once('le-petite-url-options.php');
 }
 
+function le_petite_url_short_url_header()
+{
+	if(is_page() || is_single()) {
+		global $post;
+	
+		global $wp_query;
+		global $wpdb;
+		global $petite_table;
+		
+		$blogurl = get_bloginfo('siteurl');
+		$url_table = $wpdb->prefix . $petite_table;
+		$post_id = $wp_query->post->ID;
+		$anchor_text = get_option('le_petite_url_link_text');
+	
+		$petite_url = $wpdb->get_var("SELECT petite_url FROM ".$url_table." WHERE post_id = ".$post_id."");
+		if($petite_url != "")
+		{
+			$le_petite_url_permalink = $blogurl;
+			if(get_option('le_petite_url_permalink_prefix') != "")
+			{
+				$le_petite_url_permalink = $le_petite_url_permalink . get_option('le_petite_url_permalink_custom');
+			}
+			else
+			{
+				$le_petite_url_permalink = $le_petite_url_permalink . "/";
+			}
+			$le_petite_url_permalink = $le_petite_url_permalink . $petite_url;
+			
+			echo '<link rel="short_url" href="'.$le_petite_url_permalink.'" />';
+		}
+	
+	}
+}
+ 
+
+
 register_activation_hook(__FILE__, "le_petite_url_install");
 
 add_action('template_redirect','le_petite_url_do_redirect');
 add_action('save_post','le_petite_url_make_url');
 add_action('admin_menu', 'le_petite_url_sidebar');
 add_action('admin_menu', 'le_petite_url_admin_panel');
+add_action('wp_head', 'le_petite_url_short_url_header');
 
 ?>
