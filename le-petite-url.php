@@ -303,7 +303,7 @@ function le_petite_url_short_url_header()
 			}
 			$le_petite_url_permalink = $le_petite_url_permalink . $petite_url;
 			
-			echo '<link rel="short_url" href="'.$le_petite_url_permalink.'" />';
+			echo '<link rel="alternate short_url" href="'.$le_petite_url_permalink.'" />';
 		}
 	
 	}
