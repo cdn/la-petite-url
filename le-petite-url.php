@@ -1,9 +1,9 @@
 <?php
 /*
 Plugin Name: le petite url
-Plugin URI: http://philnelson.name/projects/le-petite-url
+Plugin URI: http://extrafuture.com/projects/le-petite-url
 Description: A personal URL shortener.
-Version: 1.02
+Version: 1.02a
 Author: Phil Nelson
 Author URI: http://philnelson.name
 
