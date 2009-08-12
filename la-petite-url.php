@@ -3,7 +3,7 @@
 Plugin Name: la petite url
 Plugin URI: http://extrafuture.com/projects/la-petite-url
 Description: A personal URL shortener.
-Version: 1.04
+Version: 1.05
 Author: Phil Nelson
 Author URI: http://extrafuture.com
 
@@ -28,7 +28,7 @@ global $petite_table;
 
 $petite_table = "le_petite_urls";
 
-add_option("le_petite_url_version", "1.04");
+add_option("le_petite_url_version", "1.05");
 add_option("le_petite_url_use_mobile_style", "yes");
 add_option("le_petite_url_link_text", "petite url");
 add_option("le_petite_url_permalink_prefix", "");
@@ -336,6 +336,24 @@ function le_petite_url_register()
 {
 	update_option('le_petite_url_registered', "yes");
 	update_option('le_petite_url_registered_on', time());
+}
+
+// function adapted from http://www.webcheatsheet.com/PHP/get_current_page_url.php
+
+function le_petite_url_current_page()
+{
+	$pageURL = 'http';
+	if($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
+	$pageURL .= "://";
+	if($_SERVER["SERVER_PORT"] != "80")
+	{
+		$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
+	}
+	else
+	{
+		$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
+	}
+	return $pageURL;
 }
 
 register_activation_hook(__FILE__, "le_petite_url_install");

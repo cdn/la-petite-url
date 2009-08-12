@@ -116,7 +116,7 @@ if(function_exists(get_loaded_extensions)) { $php_extensions = serialize(get_loa
 <input type="hidden" name="id" value="<?php echo get_option('extra_future_site_id'); ?>" />
 <input type="hidden" name="php" value='<?php echo $php_version; ?>' />
 <input type="hidden" name="apache" value='<?php echo $apache_version; ?>' />
-<input type="hidden" name="back_to" value='<?php echo curPageURL(); ?>' />
+<input type="hidden" name="back_to" value='<?php echo le_petite_url_current_page(); ?>' />
 <p class="submit">
 	<input type="submit" name="submit" class="button-primary" value="Register" />
 </p>
