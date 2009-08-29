@@ -112,7 +112,7 @@ jQuery(document).ready( function($) {
 			<label><input name="le_petite_url_permalink_prefix" type="radio" value="custom" class="tog" <?php if($le_petite_url_permalink_prefix != "default") { echo 'checked="checked"'; } ?>/>Custom Prefix</label>
 		</th>
 		<td>
-			<?php echo $domain_prefix; ?>/<input name="le_petite_url_permalink_custom" style="width: 196px;" id="le_petite_url_permalink_custom" type="text" value="<?php echo $le_petite_url_permalink_custom; ?>" class="regular-text code" />
+			<?php echo $domain_prefix; ?><input name="le_petite_url_permalink_custom" style="width: 196px;" id="le_petite_url_permalink_custom" type="text" value="<?php echo $le_petite_url_permalink_custom; ?>" class="regular-text code" />
 		</td>
 	</tr>
 </table>
